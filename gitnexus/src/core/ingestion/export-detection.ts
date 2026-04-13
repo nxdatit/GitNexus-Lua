@@ -40,6 +40,32 @@ export const tsExportChecker: ExportChecker = (node, _name) => {
 /** Python: public if no leading underscore (convention). */
 export const pythonExportChecker: ExportChecker = (_node, name) => !name.startsWith('_');
 
+/**
+ * Lua: public if NOT declared with `local` keyword.
+ * - `local function foo() ... end` → private (not exported)
+ * - `function foo() ... end` → public (global)
+ * - `function M.foo() ... end` → public (module member)
+ * - `function M:bar() ... end` → public (module method)
+ * - Leading underscore in name is also treated as private (convention).
+ */
+export const luaExportChecker: ExportChecker = (node, name) => {
+  if (name.startsWith('_')) return false;
+  // Walk up looking for a `local` keyword sibling at the declaration level.
+  let current: SyntaxNode | null = node;
+  while (current) {
+    // tree-sitter-lua: `local function foo() end` → function_declaration with
+    //   first anonymous child token "local".
+    // `local X = ...` → variable_declaration with first child "local".
+    if (current.type === 'function_declaration' || current.type === 'variable_declaration') {
+      const firstChild = current.child(0);
+      if (firstChild?.type === 'local') return false;
+      return true;
+    }
+    current = current.parent;
+  }
+  return true;
+};
+
 /** Java: check for 'public' modifier — modifiers are siblings of the name node, not parents. */
 export const javaExportChecker: ExportChecker = (node, _name) => {
   let current: SyntaxNode | null = node;
