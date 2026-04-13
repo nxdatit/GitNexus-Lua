@@ -227,6 +227,12 @@ export const ENTRY_POINT_PATTERNS = {
     /^mapEventToState$/, // Legacy BLoC pattern
   ],
   [SupportedLanguages.Vue]: [], // Vue uses TypeScript queries — entry points handled via TS patterns
+  [SupportedLanguages.Lua]: [
+    /^main$/, // Common entry convention (some engines call main())
+    /^init$/, // Module init convention (Lua love2d-style, SmartPK Preload*)
+    /^Preload/, // SmartPK pattern: Preload4Android, Preload4IOS, etc.
+    /^on[A-Z]/, // Event handler convention (onLoad, onEnter, ...)
+  ],
   [SupportedLanguages.Cobol]: [], // Standalone regex processor — no tree-sitter entry points
 } satisfies Record<SupportedLanguages, RegExp[]>;
 

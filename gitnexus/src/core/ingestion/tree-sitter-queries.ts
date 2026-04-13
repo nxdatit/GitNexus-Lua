@@ -880,6 +880,48 @@ export const RUBY_QUERIES = `
   right: (_)) @assignment
 `;
 
+// Lua queries — @tree-sitter-grammars/tree-sitter-lua v0.2.0
+// Field names per grammar.js: function_call{name, arguments},
+// dot_index_expression{table, field}, method_index_expression{table, method}.
+export const LUA_QUERIES = `
+; ── Top-level/local: function foo() end / local function foo() end
+(function_declaration
+  name: (identifier) @name) @definition.function
+
+; ── Module-member: function M.foo() end
+(function_declaration
+  name: (dot_index_expression
+    field: (identifier) @name)) @definition.function
+
+; ── Module method: function M:bar() end
+(function_declaration
+  name: (method_index_expression
+    method: (identifier) @name)) @definition.method
+
+; ── Direct call: foo()
+(function_call
+  name: (identifier) @call.name) @call
+
+; ── Member call: mod.foo() / tbl.fn()
+(function_call
+  name: (dot_index_expression
+    field: (identifier) @call.name)) @call
+
+; ── Method call (implicit self): obj:method()
+(function_call
+  name: (method_index_expression
+    method: (identifier) @call.name)) @call
+
+; Import: require("module.path") / require "module.path" / require [[path]]
+; The arguments node wraps the string regardless of paren/no-paren form.
+(function_call
+  name: (identifier) @_fn
+  arguments: (arguments
+    (string
+      content: (string_content) @import.source))
+  (#eq? @_fn "require")) @import
+`;
+
 // Kotlin queries - works with tree-sitter-kotlin (fwcd/tree-sitter-kotlin)
 // Based on official tags.scm; functions use simple_identifier, classes use type_identifier
 export const KOTLIN_QUERIES = `
@@ -1269,5 +1311,6 @@ export const LANGUAGE_QUERIES: Record<SupportedLanguages, string> = {
   [SupportedLanguages.Swift]: SWIFT_QUERIES,
   [SupportedLanguages.Dart]: DART_QUERIES,
   [SupportedLanguages.Vue]: TYPESCRIPT_QUERIES, // Vue <script> blocks are parsed as TypeScript
+  [SupportedLanguages.Lua]: LUA_QUERIES,
   [SupportedLanguages.Cobol]: '', // Standalone regex processor — no tree-sitter queries
 };
