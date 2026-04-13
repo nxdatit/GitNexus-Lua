@@ -1,4 +1,7 @@
 # GitNexus
+
+> 🌙 **This fork adds Lua language support** — see [README.lua-fork.md](./README.lua-fork.md) for details, install instructions, and limitations. Lua changes live on the [`lua-support`](../../tree/lua-support) branch; `main` mirrors upstream.
+
 ⚠️ Important Notice:** GitNexus has NO official cryptocurrency, token, or coin. Any token/coin using the GitNexus name on Pump.fun or any other platform is **not affiliated with, endorsed by, or created by** this project or its maintainers. Do not purchase any cryptocurrency claiming association with GitNexus.
 
 <div align="center">
